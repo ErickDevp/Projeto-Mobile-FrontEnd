@@ -1,73 +1,51 @@
-import 'dart:convert'; // 1. Para codificar/decodificar JSON
-import 'package:http/http.dart' as http; // 2. Para fazer as chamadas HTTP
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // 3. Para armazenar o token JWT
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
+  // Use o seu IP correto aqui
+  final String _baseUrl = "http://192.168.1.9:8080";
 
-  // 4. Endereço do seu Backend Spring Boot
-  // Use 10.0.2.2 em vez de 'localhost' se estiver usando um Emulador Android
-  final String _baseUrl = "http://10.0.2.2:8080";
-
-  // 5. Instância do armazenamento seguro
   final _storage = const FlutterSecureStorage();
 
-  /// Tenta registrar um novo usuário no backend.
   Future<bool> register(String nome, String email, String senha) async {
     try {
       final response = await http.post(
-        Uri.parse("$_baseUrl/auth/register"), // 6. Endpoint de Cadastro
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8', // 7. Informa ao Spring que é JSON
-        },
-        body: jsonEncode({ // 8. Converte o objeto Dart em JSON
-          'nome': nome,
-          'email': email,
-          'senha': senha,
-        }),
+        Uri.parse("$_baseUrl/auth/register"),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'nome': nome, 'email': email, 'senha': senha}),
       );
 
-      // 9. Verifica se o backend retornou "201 Created"
-      if (response.statusCode == 201) {
-        return true; // Sucesso
+      // O backend agora retorna 200 OK com o Token também no registro
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Já faz o login automático ao registrar
+        await _salvarDadosDoUsuario(response.body);
+        return true;
       } else {
-        // Você pode tratar outros erros aqui (ex: email já existe)
         print("Falha no registro: ${response.body}");
-        return false; // Falha
+        return false;
       }
     } catch (e) {
-      // Captura erros de rede (ex: backend desligado)
       print("Erro de rede no registro: $e");
       return false;
     }
   }
 
-  /// Tenta fazer login no backend e armazena o token JWT.
   Future<bool> login(String email, String senha) async {
     try {
       final response = await http.post(
-        Uri.parse("$_baseUrl/auth/login"), // 10. Endpoint de Login
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({ // 11. Envia o DTO de Login
-          'email': email,
-          'senha': senha,
-        }),
+        Uri.parse("$_baseUrl/auth/login"),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'email': email, 'senha': senha}),
       );
 
-      // 12. Verifica se o backend retornou "200 OK"
       if (response.statusCode == 200) {
-        // 13. Pega o Token JWT (string) do corpo da resposta
-        final String token = response.body;
-
-        // 14. Armazena o token de forma segura no dispositivo
-        await _storage.write(key: 'jwt_token', value: token);
-
-        return true; // Sucesso
+        // AQUI ESTAVA O ERRO: Agora chamamos uma função para separar os dados
+        await _salvarDadosDoUsuario(response.body);
+        return true;
       } else {
-        // Você pode tratar "401 Unauthorized" (Credenciais Inválidas) aqui
         print("Falha no login: ${response.body}");
-        return false; // Falha
+        return false;
       }
     } catch (e) {
       print("Erro de rede no login: $e");
@@ -75,13 +53,56 @@ class AuthService {
     }
   }
 
-  /// Busca o token JWT armazenado no dispositivo.
+  // --- FUNÇÃO NOVA: Salva Token, ID e Nome ---
+  Future<void> _salvarDadosDoUsuario(String jsonBody) async {
+    // 1. Decodifica o JSON
+    final Map<String, dynamic> dados = jsonDecode(jsonBody);
+
+    // 2. Extrai os valores
+    String token = dados['token'];
+    int id = dados['id'];       // O Backend mandou como número
+    String nome = dados['nome'];
+
+    // 3. Salva no celular
+    await _storage.write(key: 'jwt_token', value: token);
+    await _storage.write(key: 'user_id', value: id.toString()); // Convertemos ID para String para salvar
+    await _storage.write(key: 'user_name', value: nome);
+
+    print("Login salvo! ID: $id, Nome: $nome"); // Log para conferência
+  }
+
   Future<String?> getToken() async {
     return await _storage.read(key: 'jwt_token');
   }
 
-  /// Remove o token JWT do dispositivo (Logout).
+  // Novo método para pegar o ID quando precisar
+  Future<String?> getUserId() async {
+    return await _storage.read(key: 'user_id');
+  }
+
+  Future<bool> recuperarSenha(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$_baseUrl/auth/forgot-password"),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print("Erro ao solicitar senha: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Erro de rede: $e");
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'user_id');   // Limpa o ID também
+    await _storage.delete(key: 'user_name'); // Limpa o Nome também
   }
 }

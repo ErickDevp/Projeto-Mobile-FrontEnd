@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'package:fit_tracker_pro_app/pages/main_page.dart';
+import 'package:fit_tracker_pro_app/pages/main_page.dart'; // Sua home
+import 'register_page.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,52 +12,30 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   final _authService = AuthService();
 
   bool _isLoading = false;
-
+  bool _obscureText = true; // Controle do "olhinho" da senha
 
   Future<void> _handleLogin() async {
-    // 6. Valida se os campos estão preenchidos
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
-      // 7. Chama o AuthService
       bool loginSuccess = await _authService.login(
         _emailController.text,
         _passwordController.text,
       );
 
-      // Não precisamos mais do setState aqui, pois vamos sair da tela
-      // setState(() { _isLoading = false; }); // Esta linha pode ser removida
-
-      // 8. Feedback e Navegação (A MUDANÇA ESTÁ AQUI)
-      if (loginSuccess) {
-        // SUCESSO!
-        // Navega para a MainPage e REMOVE a LoginPage da pilha
-        // Isso impede o usuário de apertar "Voltar" e retornar ao Login
-        if (mounted) { // Verifica se o widget ainda está na tela
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (loginSuccess) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const MainPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const MainPage()),
           );
-        }
-      } else {
-        // FALHA! (Mostra a SnackBar de erro)
-        // Precisamos garantir que _isLoading seja definido como false aqui
-        setState(() {
-          _isLoading = false;
-        });
-        if (mounted) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Falha no login. Verifique suas credenciais.')),
           );
@@ -66,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    // 9. Limpa os controladores quando a tela é destruída
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -74,113 +53,146 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 10. Scaffold é a estrutura básica da tela (fundo, appbar, etc.)
     return Scaffold(
-      // Define a cor de fundo para combinar com o Figma (tema escuro)
-      backgroundColor: Colors.grey[900],
+      backgroundColor: const Color(0xFF303030), // Cor exata do Figma
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView( // Permite rolar a tela se o teclado cobrir
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Form( // 11. O widget Form usa a _formKey para validação
+            child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 12. Título (Baseado no Figma)
-                  Text(
-                    'Washers', // TODO: Mudar para FIT TRACKER PRO
+                  // Título Washers
+                  const Text(
+                    'Washers',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.blue[400],
+                      color: Colors.blueAccent,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Entre com sua conta',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.blueAccent,
                     ),
                   ),
                   const SizedBox(height: 40),
 
-                  // 13. Campo de E-mail (Baseado no Figma)
+                  const Text(
+                    'Entre com sua conta',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Input E-mail (Branco)
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'E-mail',
-                      labelStyle: TextStyle(color: Colors.white70),
-                      prefixIcon: Icon(Icons.email, color: Colors.white70),
-                      filled: true,
-                      fillColor: Colors.grey[800],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    style: TextStyle(color: Colors.white),
-                    validator: (value) { // Validação simples
+                    style: const TextStyle(color: Colors.black),
+                    decoration: _inputDecorationBranca('E-mail', Icons.email),
+                    validator: (value) {
                       if (value == null || value.isEmpty || !value.contains('@')) {
-                        return 'Por favor, insira um e-mail válido';
+                        return 'Insira um e-mail válido';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // 14. Campo de Senha (Baseado no Figma)
+                  // Input Senha (Branco)
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true, // Esconde a senha
+                    obscureText: _obscureText,
+                    style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      labelText: 'Senha',
-                      labelStyle: TextStyle(color: Colors.white70),
-                      prefixIcon: Icon(Icons.lock, color: Colors.white70),
-                      suffixIcon: Icon(Icons.visibility_off, color: Colors.white70), // Ícone do olho
+                      hintText: 'Senha',
+                      prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
                       filled: true,
-                      fillColor: Colors.grey[800],
+                      fillColor: Colors.white, // Fundo branco
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    style: TextStyle(color: Colors.white),
-                    validator: (value) { // Validação simples
+                    validator: (value) {
                       if (value == null || value.isEmpty || value.length < 6) {
                         return 'A senha deve ter pelo menos 6 caracteres';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 32),
 
-                  // 15. Botão ENTRAR (Baseado no Figma)
-                  _isLoading // Se estiver carregando, mostra um indicador
-                      ? Center(child: CircularProgressIndicator())
-                      : ElevatedButton( // Se não, mostra o botão
-                    onPressed: _handleLogin, // Chama nossa função de login
-                    child: Text('ENTRAR'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[600],
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                  // Link Esqueci Senha
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordPage()));
+                      },
+                      child: const Text('Esqueci minha senha', style: TextStyle(color: Colors.blueAccent)),
                     ),
                   ),
+                  const SizedBox(height: 20),
 
-                  // TODO: Adicionar "Esqueci minha senha" e "Registre-se"
+                  // Botão Entrar
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                      : ElevatedButton(
+                    onPressed: _handleLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('ENTRAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Rodapé Registrar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Não tem uma conta? ", style: TextStyle(color: Colors.white)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+                        },
+                        child: const Text("Registre-se", style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Estilo padrão dos inputs brancos
+  InputDecoration _inputDecorationBranca(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: Icon(icon, color: Colors.grey),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
       ),
     );
   }
