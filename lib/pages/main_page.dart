@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
-// TODO: Crie e importe os arquivos das suas telas de aba
-import 'inicio_page.dart';
-// import 'profile_tab.dart'; // Tela "Perfil"
-import 'treino_page.dart';
+import 'registrar_treino_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -13,67 +9,82 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  // 1. Controla qual aba está selecionada. Começa na aba 0 (Perfil).
-  int _selectedIndex = 1; // Baseado no seu Figma, parece que "Perfil" é a primeira aba
+  int _indiceAtual = 1;
 
-  // 2. Lista de telas (widgets) que a barra de navegação irá controlar
-  // Por enquanto, usaremos placeholders (widgets de texto simples)
-  static const List<Widget> _pages = <Widget>[
-    // Aba 0: Perfil
-    Center(
-      child: Text('Tela Perfil', style: TextStyle(color: Colors.white)),
-    ),
-
-
-    InicioPage(),
-
-    TreinoPage(),
+  // Aqui estava o erro: trocamos InicioPage() por HomeContent()
+  final List<Widget> _telas = [
+    const Center(child: Text("Perfil (Em breve)", style: TextStyle(color: Colors.white))),
+    const HomeContent(),
   ];
-
-  // 3. Função chamada quando o usuário clica em uma aba
-  void _onItemTapped(int index) {
-    setState(() { // Atualiza o estado
-      _selectedIndex = index; // Define a nova aba selecionada
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 4. O corpo da tela muda baseado na aba selecionada
-      body: _pages.elementAt(_selectedIndex),
-
-      // 5. A Barra de Navegação Inferior (BottomNavigationBar)
+      backgroundColor: const Color(0xFF303030),
+      body: SafeArea(child: _telas[_indiceAtual]),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          // Item 0: Perfil
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person), // Ícone quando selecionado
-            label: 'Perfil',
-          ),
-
-          // Item 1: Início
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Início',
-          ),
-
-          // Item 2: Treino
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center_outlined),
-            activeIcon: Icon(Icons.fitness_center),
-            label: 'Treino',
-          ),
+        currentIndex: _indiceAtual,
+        onTap: (index) => setState(() => _indiceAtual = index),
+        backgroundColor: const Color(0xFF202020),
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Treino'),
         ],
-        currentIndex: _selectedIndex, // Informa qual item está ativo
-        onTap: _onItemTapped, // Função a ser chamada ao tocar
+      ),
+    );
+  }
+}
 
-        // Estilização para combinar com o tema escuro
-        backgroundColor: Colors.grey[900],
-        selectedItemColor: Colors.blue[400], // Cor do item ativo
-        unselectedItemColor: Colors.white70, // Cor dos itens inativos
+class HomeContent extends StatelessWidget {
+  const HomeContent({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const CircleAvatar(radius: 20, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.grey)),
+              const Text('Washers', style: TextStyle(color: Colors.blueAccent, fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 40),
+            ],
+          ),
+erick          const SizedBox(height: 40),
+          _botaoAzul(context, titulo: "+ Registrar Treino", onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrarTreinoPage()));
+          }),
+          const SizedBox(height: 16),
+          _botaoAzul(context, titulo: "Minhas Rotinas", icone: Icons.list_alt, onTap: () {}),
+          const SizedBox(height: 30),
+          const Text("Rotinas", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          _botaoAzul(context, titulo: "Criar Rotina", icone: Icons.edit_note, onTap: () {}),
+          const SizedBox(height: 16),
+          _botaoAzul(context, titulo: "Explorar Rotinas", icone: Icons.search, onTap: () {}),
+        ],
+      ),
+    );
+  }
+
+  Widget _botaoAzul(BuildContext context, {required String titulo, required VoidCallback onTap, IconData? icone}) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: Row(
+        children: [
+          if (icone != null) ...[Icon(icone, color: Colors.white), const SizedBox(width: 10)],
+          Text(titulo, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
       ),
     );
   }

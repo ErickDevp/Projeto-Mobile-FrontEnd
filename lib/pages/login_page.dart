@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerLeft,
                     child: TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPasswordPage()));
                       },
                       child: const Text('Esqueci minha senha', style: TextStyle(color: Colors.blueAccent)),
                     ),

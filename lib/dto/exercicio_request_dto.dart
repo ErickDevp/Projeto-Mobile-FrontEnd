@@ -1,26 +1,26 @@
 class ExercicioRequestDTO {
-  String nomeExercicio;
-  int series;
-  String repeticoes;
-  double cargaTotalKg;
-  String? observacoesEx;
+  final String nome;
+  final String? observacao;
+  final int series;
+  final int repeticoes;
+  final double carga;
 
+  // CORREÇÃO: Adicionamos as chaves {} para aceitar parâmetros nomeados
   ExercicioRequestDTO({
-    required this.nomeExercicio,
+    required this.nome,
+    this.observacao,
     required this.series,
     required this.repeticoes,
-    required this.cargaTotalKg,
-    this.observacoesEx,
+    required this.carga,
   });
 
-  // Converte o objeto Dart para um Mapa (para ser usado no jsonEncode)
   Map<String, dynamic> toJson() {
     return {
-      'nomeExercicio': nomeExercicio,
+      'nomeExercicio': nome,
+      'cargaTotalKg': carga,
       'series': series,
       'repeticoes': repeticoes,
-      'cargaTotalKg': cargaTotalKg,
-      'observacoesEx': observacoesEx,
+      'observacao': observacao,
     };
   }
 }

@@ -1,30 +1,37 @@
-// lib/models/treino_request_dto.dart
 import 'exercicio_request_dto.dart';
 
 class TreinoRequestDTO {
-  String nomeRotina;
-  int? duracaoMin;
-  int? intensidadeGeral;
-  String? observacoes;
-  List<ExercicioRequestDTO> exercicios;
+  final String nome;
+  final String duracaoEstimada;
+  final String intensidade;
+  final String observacao;
+  final List<ExercicioRequestDTO> exercicios;
 
   TreinoRequestDTO({
-    required this.nomeRotina,
-    this.duracaoMin,
-    this.intensidadeGeral,
-    this.observacoes,
+    required this.nome,
+    required this.duracaoEstimada,
+    required this.intensidade,
+    required this.observacao,
     required this.exercicios,
   });
 
-  // Converte o objeto Dart (e sua lista) para um Mapa
   Map<String, dynamic> toJson() {
+    // Tenta limpar o texto para pegar só os números.
+    // Ex: se digitar "60 min", vira 60. Se digitar "Alta", vira 1 (padrão).
+    int duracaoInt = int.tryParse(duracaoEstimada.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+
+    // ATENÇÃO: Seu backend espera um NÚMERO para intensidade.
+    // Por enquanto, vou tentar ler um número. Se escrever texto ("Alta"), vai enviar 1.
+    int intensidadeInt = int.tryParse(intensidade.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
+
     return {
-      'nomeRotina': nomeRotina,
-      'duracaoMin': duracaoMin,
-      'intensidadeGeral': intensidadeGeral,
-      'observacoes': observacoes,
-      // Mapeia a lista de objetos Exercicio para uma lista de Mapas
-      'exercicios': exercicios.map((ex) => ex.toJson()).toList(),
+      // TRADUÇÃO PARA O JAVA:
+      'nomeRotina': nome,              // Java: nomeRotina
+      'duracaoMin': duracaoInt,        // Java: duracaoMin (Integer)
+      'intensidadeGeral': intensidadeInt, // Java: intensidadeGeral (Integer)
+      'observacoes': observacao,       // Java: observacoes (Plural)
+
+      'exercicios': exercicios.map((e) => e.toJson()).toList(),
     };
   }
 }
