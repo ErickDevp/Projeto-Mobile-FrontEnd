@@ -1,26 +1,25 @@
 class ExercicioRequestDTO {
-  final String nome;
-  final String? observacao;
+  final String nomeExercicio;
   final int series;
-  final int repeticoes;
-  final double carga;
+  final String repeticoes;
+  final double cargaTotalKg;
+  final String observacoesEx;
 
-  // CORREÇÃO: Adicionamos as chaves {} para aceitar parâmetros nomeados
   ExercicioRequestDTO({
-    required this.nome,
-    this.observacao,
+    required this.nomeExercicio,
     required this.series,
     required this.repeticoes,
-    required this.carga,
+    required this.cargaTotalKg,
+    required this.observacoesEx,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'nomeExercicio': nome,
-      'cargaTotalKg': carga,
+      'nomeExercicio': nomeExercicio,
       'series': series,
       'repeticoes': repeticoes,
-      'observacao': observacao,
+      'cargaTotalKg': cargaTotalKg,
+      'observacoesEx': observacoesEx,
     };
   }
 }

@@ -57,24 +57,27 @@ class _RegistrarTreinoPageState extends State<RegistrarTreinoPage> {
             const SizedBox(height: 20),
 
             // Linha Dupla: Duração e Intensidade
+            // Linha Dupla: Duração e Intensidade
             Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label("Duração"),
-                      _inputEscuro(_duracaoController, "Ex: 60 min"),
+                      _label("Duração (min)"),
+                      // Agora chama o teclado numérico
+                      _inputEscuro(_duracaoController, "Ex: 60", tipoTeclado: TextInputType.number),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16), // Espaço entre os dois
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label("Intensidade"),
-                      _inputEscuro(_intensidadeController, "Ex: Alta"),
+                      _label("Intensidade (1-10)"), // Mudei o label para orientar
+                      // Agora chama o teclado numérico
+                      _inputEscuro(_intensidadeController, "Ex: 8", tipoTeclado: TextInputType.number),
                     ],
                   ),
                 ),
@@ -129,19 +132,24 @@ class _RegistrarTreinoPageState extends State<RegistrarTreinoPage> {
   }
 
   // Widget auxiliar para os Campos Escuros (Cinza)
-  Widget _inputEscuro(TextEditingController controller, String hint, {int linhas = 1}) {
+  Widget _inputEscuro(
+      TextEditingController controller,
+      String hint,
+      {int linhas = 1, TextInputType tipoTeclado = TextInputType.text} // <--- Mudança aqui
+      ) {
     return TextField(
       controller: controller,
       maxLines: linhas,
-      style: const TextStyle(color: Colors.white), // Texto digitado branco
+      keyboardType: tipoTeclado, // <--- E aqui: Define qual teclado abre no celular
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey[600]),
         filled: true,
-        fillColor: const Color(0xFF424242), // Cinza mais claro que o fundo
+        fillColor: const Color(0xFF424242),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none, // Sem borda preta
+          borderSide: BorderSide.none,
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),

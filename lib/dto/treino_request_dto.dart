@@ -16,8 +16,7 @@ class TreinoRequestDTO {
   });
 
   Map<String, dynamic> toJson() {
-    // Tenta limpar o texto para pegar só os números.
-    // Ex: se digitar "60 min", vira 60. Se digitar "Alta", vira 1 (padrão).
+
     int duracaoInt = int.tryParse(duracaoEstimada.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 
     // ATENÇÃO: Seu backend espera um NÚMERO para intensidade.

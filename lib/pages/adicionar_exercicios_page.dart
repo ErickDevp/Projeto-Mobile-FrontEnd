@@ -70,11 +70,11 @@ class _AdicionarExerciciosPageState extends State<AdicionarExerciciosPage> {
     // CORREÇÃO AQUI: Adicionei os dois pontos (:) que faltavam e corrigi 'tryParse'
     List<ExercicioRequestDTO> listaExerciciosDto = _exerciciosAdicionados.map<ExercicioRequestDTO>((ex) {
       return ExercicioRequestDTO(
-        nome: ex['nome']!, // Faltava o dois pontos aqui
-        series: int.tryParse(ex['series'] ?? '0') ?? 0, // Estava escrito 'tryPares'
-        repeticoes: int.tryParse(ex['reps'] ?? '0') ?? 0,
-        carga: double.tryParse(ex['carga'] ?? '0') ?? 0.0,
-        observacao: ex['obs'],
+        nomeExercicio: ex['nome']!,
+        series: int.tryParse(ex['series'] ?? '0') ?? 0,
+        repeticoes: ex['reps'] ?? '0',
+        cargaTotalKg: double.tryParse(ex['carga'] ?? '0') ?? 0.0,
+        observacoesEx: ex['obs'] ?? '',
       );
     }).toList();
 

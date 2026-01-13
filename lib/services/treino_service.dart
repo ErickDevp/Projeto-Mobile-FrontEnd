@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../dto/treino_request_dto.dart';
-// import '../dto/exercicio_request_dto.dart'; // Mantenha descomentado se seu projeto precisar
+// Imports dos DTOs
+import '../dto/treino_request_dto.dart'; // Usado para ENVIAR (Registrar)
+import '../dto/treino_response_dto.dart'; // <--- NOVO: Usado para RECEBER (Listar)
 
 class TreinoService {
-  // Endereço do Backend (Seu IP Local)
-  final String _baseUrl = "http://192.168.1.9:8080";
+  // ⚠️ ATENÇÃO: Confirme se seu IP fixo é .17 ou .9 (vimos isso mais cedo)
+  final String _baseUrl = "http://192.168.1.17:8080";
 
   final _storage = const FlutterSecureStorage();
 
@@ -21,26 +22,26 @@ class TreinoService {
 
   /// Busca o ID do usuário salvo no storage.
   Future<String?> _getUserId() async {
-    // Chave corrigida para bater com o AuthService
     return await _storage.read(key: 'user_id');
   }
 
-  /// Busca o histórico de treinos do usuário no backend.
-  Future<List<dynamic>> getHistoricoTreinos() async {
+  /// Busca o histórico de treinos e já converte para o DTO correto
+  // MUDANÇA AQUI: Retorna List<TreinoResponseDTO> em vez de List<dynamic>
+  Future<List<TreinoResponseDTO>> getHistoricoTreinos() async {
     try {
       final headers = await _getAuthHeaders();
 
-      // 🚨 CORREÇÃO DE URL:
-      // No Java: @GetMapping em "/api/treino" retorna a lista.
-      // Não precisa passar ID na URL, o Token já identifica o usuário.
       final response = await http.get(
         Uri.parse("$_baseUrl/api/treino"),
         headers: headers,
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> treinos = jsonDecode(response.body);
-        return treinos;
+        // Converte o JSON puro para a nossa Lista de Objetos
+        List<dynamic> body = jsonDecode(response.body);
+
+        // A mágica acontece aqui: mapeamos cada item do JSON para o DTO
+        return body.map((item) => TreinoResponseDTO.fromJson(item)).toList();
       } else {
         print("Erro ao buscar histórico. Status: ${response.statusCode}");
         return [];
@@ -54,7 +55,6 @@ class TreinoService {
   /// Salva um novo treino no backend.
   Future<bool> registrarTreino(TreinoRequestDTO treinoParaSalvar) async {
     try {
-      // Verificação de segurança apenas
       final usuarioId = await _getUserId();
       if (usuarioId == null) {
         print("ERRO: Usuário não logado (ID null).");
@@ -64,9 +64,6 @@ class TreinoService {
       final headers = await _getAuthHeaders();
       String body = jsonEncode(treinoParaSalvar.toJson());
 
-      // 🚨 CORREÇÃO DE URL:
-      // No Java: @PostMapping("/criar") em "/api/treino"
-      // URL Final: http://.../api/treino/criar
       final response = await http.post(
         Uri.parse("$_baseUrl/api/treino/criar"),
         headers: headers,
@@ -83,6 +80,30 @@ class TreinoService {
       }
     } catch (e) {
       print("Erro de rede ao registrar treino: $e");
+      return false;
+    }
+  }
+
+  /// Deleta um treino pelo ID
+  Future<bool> deletarTreino(int idTreino) async {
+    try {
+      final headers = await _getAuthHeaders();
+
+      // Assume que no Java a rota é DELETE /api/treino/{id}
+      final response = await http.delete(
+        Uri.parse("$_baseUrl/api/treino/$idTreino"),
+        headers: headers,
+      );
+
+      // 200 (OK) ou 204 (No Content) significam sucesso
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print("Erro ao deletar. Status: ${response.statusCode}");
+        return false;
+      }
+    } catch (e) {
+      print("Erro de rede ao deletar: $e");
       return false;
     }
   }
