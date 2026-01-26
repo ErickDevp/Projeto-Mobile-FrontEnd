@@ -1,17 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// Imports dos DTOs
-import '../dto/treino_request_dto.dart'; // Usado para ENVIAR (Registrar)
-import '../dto/treino_response_dto.dart'; // <--- NOVO: Usado para RECEBER (Listar)
+import '../dto/treino_request_dto.dart';
+import '../dto/treino_response_dto.dart';
+import 'dart:convert';
 
 class TreinoService {
-  // ⚠️ ATENÇÃO: Confirme se seu IP fixo é .17 ou .9 (vimos isso mais cedo)
-  final String _baseUrl = "http://192.168.1.17:8080";
+  final String _baseUrl = "http://192.168.1.14:8080";
 
   final _storage = const FlutterSecureStorage();
 
-  /// Busca o cabeçalho de autenticação (Token JWT).
   Future<Map<String, String>> _getAuthHeaders() async {
     final token = await _storage.read(key: 'jwt_token');
     return {
@@ -20,13 +18,10 @@ class TreinoService {
     };
   }
 
-  /// Busca o ID do usuário salvo no storage.
   Future<String?> _getUserId() async {
     return await _storage.read(key: 'user_id');
   }
 
-  /// Busca o histórico de treinos e já converte para o DTO correto
-  // MUDANÇA AQUI: Retorna List<TreinoResponseDTO> em vez de List<dynamic>
   Future<List<TreinoResponseDTO>> getHistoricoTreinos() async {
     try {
       final headers = await _getAuthHeaders();
@@ -37,10 +32,8 @@ class TreinoService {
       );
 
       if (response.statusCode == 200) {
-        // Converte o JSON puro para a nossa Lista de Objetos
         List<dynamic> body = jsonDecode(response.body);
 
-        // A mágica acontece aqui: mapeamos cada item do JSON para o DTO
         return body.map((item) => TreinoResponseDTO.fromJson(item)).toList();
       } else {
         print("Erro ao buscar histórico. Status: ${response.statusCode}");
@@ -104,6 +97,33 @@ class TreinoService {
       }
     } catch (e) {
       print("Erro de rede ao deletar: $e");
+      return false;
+    }
+  }
+
+  Future<bool> atualizarTreino(int id, TreinoRequestDTO treino) async {
+    final url = Uri.parse('$_baseUrl/api/treino/$id');
+
+    try {
+      // 1. AQUI ESTÁ A CORREÇÃO:
+      // Usamos o método auxiliar que VOCÊ JÁ TEM na classe.
+      // Ele busca do FlutterSecureStorage com a chave 'jwt_token' correta.
+      final headers = await _getAuthHeaders();
+
+      final response = await http.put(
+        url,
+        headers: headers, // Enviamos o cabeçalho certinho
+        body: jsonEncode(treino.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print("Erro Back-end: ${response.statusCode} - Body: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Erro de conexão no Flutter: $e");
       return false;
     }
   }

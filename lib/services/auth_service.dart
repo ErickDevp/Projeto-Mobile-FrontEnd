@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   // Use o seu IP correto aqui
-  final String _baseUrl = "http://192.168.1.17:8080";
+  final String _baseUrl = "http://192.168.1.14:8080";
 
   final _storage = const FlutterSecureStorage();
 

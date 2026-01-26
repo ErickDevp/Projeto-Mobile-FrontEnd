@@ -4,7 +4,8 @@ import '../services/usuario_service.dart';
 import '../dto/treino_response_dto.dart';
 import '../dto/usuario_response_dto.dart';
 import 'ver_treino_page.dart';
-import 'editar_perfil_page.dart'; // <--- Importante: Import da tela de editar
+import 'editar_perfil_page.dart';
+import 'editar_treino_page.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({Key? key}) : super(key: key);
@@ -14,12 +15,11 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
-  // Instancia os serviços
   final TreinoService _treinoService = TreinoService();
   final UsuarioService _usuarioService = UsuarioService();
 
   List<TreinoResponseDTO> _meusTreinos = [];
-  UsuarioResponseDTO? _usuario; // Guarda os dados do usuário (Nome, Email, Objetivo)
+  UsuarioResponseDTO? _usuario;
   bool _carregando = true;
 
   @override
@@ -28,7 +28,6 @@ class _PerfilPageState extends State<PerfilPage> {
     _carregarDados();
   }
 
-  // Busca dados do Usuário + Histórico de Treinos
   void _carregarDados() async {
     setState(() => _carregando = true);
 
@@ -39,7 +38,7 @@ class _PerfilPageState extends State<PerfilPage> {
       if (mounted) {
         setState(() {
           _usuario = dadosUsuario;
-          _meusTreinos = listaTreinos.reversed.toList(); // Mais recentes primeiro
+          _meusTreinos = listaTreinos.reversed.toList();
           _carregando = false;
         });
       }
@@ -51,11 +50,10 @@ class _PerfilPageState extends State<PerfilPage> {
     }
   }
 
-  // --- LÓGICA DE EXCLUSÃO (IGUAL AO QUE JÁ TINHA) ---
   void _deletarTreino(int id) async {
     bool sucesso = await _treinoService.deletarTreino(id);
     if (sucesso) {
-      _carregarDados(); // Recarrega para atualizar o contador de treinos
+      _carregarDados();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Treino excluído!"), backgroundColor: Colors.redAccent),
@@ -121,8 +119,7 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Widget _cabecalhoPerfil() {
-    // 1. Defina o endereço do seu backend aqui (igual ao do Service)
-    const String baseUrl = "http://192.168.1.17:8080";
+    const String baseUrl = "http://192.168.1.14:8080";
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -132,7 +129,6 @@ class _PerfilPageState extends State<PerfilPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // --- AQUI COMEÇA A MÁGICA DA FOTO ---
               CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.white,
@@ -143,7 +139,6 @@ class _PerfilPageState extends State<PerfilPage> {
                     ? const Icon(Icons.person, size: 50, color: Colors.grey)
                     : null,
               ),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -183,7 +178,6 @@ class _PerfilPageState extends State<PerfilPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Aqui mantemos a correção do contador de treinos que fizemos antes
                           _StatItem(valor: "${_meusTreinos.length}", label: "Treinos"),
                           _StatItem(valor: "${_usuario?.diasAtivo ?? 0} Dias", label: "Dias Ativo"),
                           _StatItem(valor: _usuario?.objetivo ?? "-", label: "Objetivo"),
@@ -228,18 +222,35 @@ class _PerfilPageState extends State<PerfilPage> {
                 ],
               ),
               const Spacer(),
+
+              // --- MENU DE OPÇÕES ATUALIZADO ---
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_horiz, color: Colors.white),
                 color: const Color(0xFF424242),
                 onSelected: (opcao) {
                   if (opcao == 'ver') {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => VerTreinoPage(treino: treino)));
+
+                  } else if (opcao == 'editar') {
+                    // <--- 2. LÓGICA DE EDITAR AQUI
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditarTreinoPage(treino: treino),
+                      ),
+                    ).then((atualizou) {
+                      if (atualizou == true) {
+                        _carregarDados(); // Recarrega se salvou
+                      }
+                    });
+
                   } else if (opcao == 'excluir') {
                     _confirmarExclusao(treino.id);
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(value: 'ver', child: Text('Ver Treino', style: TextStyle(color: Colors.white))),
+                  const PopupMenuItem<String>(value: 'editar', child: Text('Editar', style: TextStyle(color: Colors.white))), // <--- 3. BOTÃO NO MENU
                   const PopupMenuItem<String>(value: 'excluir', child: Text('Excluir', style: TextStyle(color: Colors.redAccent))),
                 ],
               ),
@@ -248,7 +259,6 @@ class _PerfilPageState extends State<PerfilPage> {
           const SizedBox(height: 12),
           Text(treino.nomeRotina, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
-          // Mostra apenas os 3 primeiros exercícios
           ...treino.exercicios.take(3).map((ex) => _linhaExercicio(ex.nomeExercicio, "${ex.cargaTotalKg} kg", ex.repeticoes, "${ex.series}")).toList(),
           if (treino.exercicios.length > 3)
             const Padding(padding: EdgeInsets.only(top: 8), child: Center(child: Text("...", style: TextStyle(color: Colors.grey)))),

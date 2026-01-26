@@ -7,7 +7,7 @@ import '../dto/usuario_request_dto.dart';
 
 class UsuarioService {
   // Ajuste o IP se necessário
-  final String _baseUrl = "http://192.168.1.17:8080";
+  final String _baseUrl = "http://192.168.1.14:8080";
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, String>> _getAuthHeaders() async {

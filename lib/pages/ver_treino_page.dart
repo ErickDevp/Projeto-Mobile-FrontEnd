@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../dto/treino_response_dto.dart';
+import '../dto/exercicio_response_dto.dart';
 
 class VerTreinoPage extends StatelessWidget {
   final TreinoResponseDTO treino;

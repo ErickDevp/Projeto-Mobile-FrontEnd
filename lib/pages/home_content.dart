@@ -15,7 +15,7 @@ class _HomeContentState extends State<HomeContent> {
   UsuarioResponseDTO? _usuario; // Só para pegar a foto
 
   // URL do seu backend
-  final String baseUrl = "http://192.168.1.17:8080";
+  final String baseUrl = "http://192.168.1.14:8080";
 
   @override
   void initState() {

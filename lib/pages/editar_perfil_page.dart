@@ -1,6 +1,6 @@
-import 'dart:io'; // Importante para lidar com arquivo
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Importante para abrir galeria
+import 'package:image_picker/image_picker.dart';
 import '../dto/usuario_response_dto.dart';
 import '../dto/usuario_request_dto.dart';
 import '../services/usuario_service.dart';
@@ -23,7 +23,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
   late TextEditingController _objetivoController;
 
   bool _salvando = false;
-  File? _fotoSelecionada; // Guarda a foto se o usuário escolher uma nova
+  File? _fotoSelecionada;
 
   @override
   void initState() {
@@ -42,8 +42,6 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
         _fotoSelecionada = File(foto.path);
       });
 
-      // Opcional: Já enviar assim que escolher, ou esperar o botão Salvar.
-      // Aqui vou deixar para enviar só quando clicar em SALVAR.
     }
   }
 
@@ -86,7 +84,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
   @override
   Widget build(BuildContext context) {
     // URL do servidor (Ajuste o IP se mudar)
-    const String baseUrl = "http://192.168.1.17:8080";
+    const String baseUrl = "http://192.168.1.14:8080";
 
     return Scaffold(
       backgroundColor: const Color(0xFF303030),
