@@ -11,7 +11,7 @@ class FitTrackerProApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 2. MaterialApp é o widget raiz do seu aplicativo
+    // 2. MaterialApp é o widget raiz do seu aplicativo:
     return MaterialApp(
       title: 'Fit Tracker Pro', // Título do App
       debugShowCheckedModeBanner: false, // Remove a faixa "Debug" no canto
