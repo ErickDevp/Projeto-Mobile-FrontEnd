@@ -11,7 +11,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
-  final _sobrenomeController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repeatPasswordController = TextEditingController();
@@ -28,9 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       setState(() => _isLoading = true);
 
-      // Junta nome e sobrenome
-      String nomeCompleto = "${_nomeController.text} ${_sobrenomeController.text}".trim();
-
+      String nomeCompleto = _nomeController.text.trim();
       bool success = await _authService.register(
         nomeCompleto,
         _emailController.text,
@@ -81,26 +78,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Text("Crie sua conta", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
 
-                // Linha Nome e Sobrenome
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _nomeController,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _inputDecorationBranca("Nome", Icons.person),
-                        validator: (v) => v!.isEmpty ? 'Obrigatório' : null,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _sobrenomeController,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _inputDecorationBranca("Sobrenome", Icons.person_outline),
-                      ),
-                    ),
-                  ],
+                TextFormField(
+                  controller: _nomeController,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: _inputDecorationBranca("Nome Completo", Icons.person),
+                  validator: (v) => v!.isEmpty ? 'Obrigatório' : null,
                 ),
                 const SizedBox(height: 16),
 
