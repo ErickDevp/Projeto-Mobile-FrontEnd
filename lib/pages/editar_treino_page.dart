@@ -29,7 +29,7 @@ class _EditarTreinoPageState extends State<EditarTreinoPage> {
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController(text: widget.treino.nomeRotina);
+    _nomeController = TextEditingController(text: widget.treino.nomeTreino);
     _duracaoController = TextEditingController(text: widget.treino.duracaoMin.toString());
 
     // Inicializa a intensidade com o valor que veio do banco (convertido para texto)
@@ -140,7 +140,7 @@ class _EditarTreinoPageState extends State<EditarTreinoPage> {
 
     // Mantendo envio como STRING para respeitar seu DTO atual
     TreinoRequestDTO treinoAtualizado = TreinoRequestDTO(
-      nomeRotina: _nomeController.text,
+      nomeTreino: _nomeController.text,
       duracaoEstimada: _duracaoController.text,
       intensidade: _intensidadeController.text, // <--- Envia o texto digitado (ex: "8")
       observacao: _obsTreinoController.text,

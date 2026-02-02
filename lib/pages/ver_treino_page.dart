@@ -29,7 +29,7 @@ class VerTreinoPage extends StatelessWidget {
             // Título do Treino
             Center(
               child: Text(
-                treino.nomeRotina,
+                treino.nomeTreino,
                 style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),

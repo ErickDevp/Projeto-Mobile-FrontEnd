@@ -1,14 +1,14 @@
 import 'exercicio_request_dto.dart';
 
 class TreinoRequestDTO {
-  final String nomeRotina;
+  final String nomeTreino;
   final String duracaoEstimada;
   final String intensidade;
   final String observacao;
   final List<ExercicioRequestDTO> exercicios;
 
   TreinoRequestDTO({
-    required this.nomeRotina,
+    required this.nomeTreino,
     required this.exercicios,
     this.duracaoEstimada = "0",
     this.intensidade = "1",
@@ -21,7 +21,7 @@ class TreinoRequestDTO {
     int intensidadeInt = int.tryParse(intensidade.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
 
     return {
-      'nomeRotina': nomeRotina,
+      'nomeTreino': nomeTreino,
       'duracaoMin': duracaoInt,
       'intensidadeGeral': intensidadeInt,
       'observacoes': observacao,

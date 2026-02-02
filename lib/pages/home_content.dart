@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'registrar_treino_page.dart';
+import 'minhas_rotinas_page.dart';
+import 'explorar_rotinas_page.dart';
+import 'package:fit_tracker_pro_app/pages/criar_rotina_screen.dart';
 import '../services/usuario_service.dart';
 import '../dto/usuario_response_dto.dart';
 
@@ -15,7 +18,7 @@ class _HomeContentState extends State<HomeContent> {
   UsuarioResponseDTO? _usuario; // Só para pegar a foto
 
   // URL do seu backend
-  final String baseUrl = "http://192.168.1.14:8080";
+  final String baseUrl = "http://10.0.0.4:8080";
 
   @override
   void initState() {
@@ -80,20 +83,43 @@ class _HomeContentState extends State<HomeContent> {
           // --- BOTÕES DE AÇÃO (Mantidos iguais) ---
 
           _botaoAzul(context, titulo: "+ Registrar Treino", onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrarTreinoPage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RegistrarTreinoPage())
+            );
           }),
 
           const SizedBox(height: 16),
-          _botaoAzul(context, titulo: "Minhas Rotinas", icone: Icons.list_alt, onTap: () {}),
+          _botaoAzul(
+            context,
+            titulo: "Minhas Rotinas",
+            icone: Icons.list_alt,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MinhasRotinasPage()),
+              );
+            },
+          ),
 
           const SizedBox(height: 30),
           const Text("Rotinas", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
-          _botaoAzul(context, titulo: "Criar Rotina", icone: Icons.edit_note, onTap: () {}),
+          _botaoAzul(context, titulo: "Criar Rotina", icone: Icons.edit_note, onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CriarRotinaScreen())
+            );
+          }),
 
           const SizedBox(height: 16),
-          _botaoAzul(context, titulo: "Explorar Rotinas", icone: Icons.search, onTap: () {}),
+          _botaoAzul(context, titulo: "Explorar Rotinas", icone: Icons.search, onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ExplorarRotinasPage()),
+            );
+          }),
         ],
       ),
     );

@@ -6,7 +6,7 @@ import '../dto/treino_response_dto.dart';
 import 'dart:convert';
 
 class TreinoService {
-  final String _baseUrl = "http://192.168.1.14:8080";
+  final String _baseUrl = "http://10.0.0.4:8080";
 
   final _storage = const FlutterSecureStorage();
 
