@@ -16,7 +16,7 @@ class TreinoPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.grey[900], // Fundo escuro
+        backgroundColor: Colors.grey[900], // Fund o escuro
         centerTitle: true,
         elevation: 0, // Sem sombra
         actions: [
@@ -76,7 +76,11 @@ class TreinoPage extends StatelessWidget {
               icon: Icon(Icons.edit_outlined, color: Colors.blue[400]),
               label: Text('Criar Rotina', style: TextStyle(color: Colors.blue[400], fontSize: 16)),
               onPressed: () {
-                // TODO: Navegar para a tela de criação de rotina
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const RegistrarTreinoPage(),
+                  ),
+                );
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: Colors.blue[400]!),

@@ -80,7 +80,7 @@ class _AdicionarExerciciosPageState extends State<AdicionarExerciciosPage> {
 
     // 3. Monta o Treino
     TreinoRequestDTO treinoNovo = TreinoRequestDTO(
-      nomeRotina: widget.nomeTreino,
+      nomeTreino: widget.nomeTreino,
       duracaoEstimada: widget.duracao,
       intensidade: widget.intensidade,
       observacao: widget.obs,

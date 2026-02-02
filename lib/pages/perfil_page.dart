@@ -119,7 +119,7 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Widget _cabecalhoPerfil() {
-    const String baseUrl = "http://192.168.1.14:8080";
+    const String baseUrl = "http://10.0.0.4:8080";
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -257,7 +257,7 @@ class _PerfilPageState extends State<PerfilPage> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(treino.nomeRotina, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(treino.nomeTreino, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           ...treino.exercicios.take(3).map((ex) => _linhaExercicio(ex.nomeExercicio, "${ex.cargaTotalKg} kg", ex.repeticoes, "${ex.series}")).toList(),
           if (treino.exercicios.length > 3)
